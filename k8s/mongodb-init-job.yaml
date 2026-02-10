@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init
+  namespace: mongodb-replica
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mongodb-init
+        image: mongo:6.0
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "MongoDB replica set başlatılıyor..."
+          echo "Tüm pod'ların hazır olması bekleniyor (60 saniye)..."
+          sleep 60
+          
+          echo "Replica set başlatma denemesi..."
+          for i in {1..10}; do
+            echo "Deneme $i..."
+            
+            mongosh --host mongodb-0.mongodb-service.mongodb-replica.svc.cluster.local:27017 <<EOF
+            try {
+              rs.status();
+              print("Replica set zaten başlatılmış");
+              quit(0);
+            } catch(e) {
+              print("Replica set başlatılıyor...");
+              var result = rs.initiate({
+                _id: "rs0",
+                members: [
+                  { _id: 0, host: "mongodb-0.mongodb-service.mongodb-replica.svc.cluster.local:27017", priority: 2 },
+                  { _id: 1, host: "mongodb-1.mongodb-service.mongodb-replica.svc.cluster.local:27017", priority: 1 },
+                  { _id: 2, host: "mongodb-2.mongodb-service.mongodb-replica.svc.cluster.local:27017", priority: 1 },
+                  { _id: 3, host: "mongodb-3.mongodb-service.mongodb-replica.svc.cluster.local:27017", priority: 1 }
+                ]
+              });
+              if (result.ok === 1) {
+                print("Replica set başarıyla başlatıldı!");
+                quit(0);
+              } else {
+                print("Hata: " + JSON.stringify(result));
+                quit(1);
+              }
+            }
+          EOF
+            
+            if [ $? -eq 0 ]; then
+              echo "İşlem başarılı!"
+              exit 0
+            fi
+            
+            echo "Başarısız, 10 saniye sonra tekrar denenecek..."
+            sleep 10
+          done
+          
+          echo "10 deneme sonunda başarısız oldu!"
+          exit 1

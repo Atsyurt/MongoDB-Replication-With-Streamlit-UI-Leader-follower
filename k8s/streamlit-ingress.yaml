@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mongodb-streamlit-ingress
+  namespace: mongodb-replica
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "9999m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: nginx-sharemind
+  rules:
+  - host: sharemind.tiga.health
+    http:
+      paths:
+      - path: /dev/streamlit
+        pathType: Prefix
+        backend:
+          service:
+            name: streamlit-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - sharemind.tiga.health
+    secretName: wildcard-tiga-health-tls
