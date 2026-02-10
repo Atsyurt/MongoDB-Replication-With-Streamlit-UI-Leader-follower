@@ -1,0 +1,51 @@
+# Python
+*.py[cod]
+__pycache__/
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+k8s/streamlit-ingress.yaml
+# Streamlit
+.streamlit/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# MongoDB data (local)
+mongo*_data/
+
+# Docker
+.dockerignore
+
+# Kubernetes secrets (never commit!)
+*-secret.yaml
+*-secrets.yaml
+*.key
+*.crt
+*.pem
+
+# Temporary files
+*.tmp
+*.temp
