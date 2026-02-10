@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: nginx-sharemind
   rules:
-  - host: sharemind.tiga.health
+  - host: ##yourhostname##
     http:
       paths:
       - path: /dev/streamlit
@@ -22,5 +22,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - sharemind.tiga.health
+    - ##yourhostname##
     secretName: wildcard-tiga-health-tls
